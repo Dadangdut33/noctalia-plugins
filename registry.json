@@ -1,0 +1,16 @@
+{
+  "version": 1,
+  "plugins": [
+    {
+      "id": "niri-focus-arrows",
+      "name": "Niri Focus Arrows",
+      "version": "1.0.0",
+      "minNoctaliaVersion": "4.1.2",
+      "author": "Dadangdut33",
+      "license": "MIT",
+      "repository": "https://github.com/dadangdut33/noctalia-plugins",
+      "description": "A simple Bar widget that gives left/right arrow to help mouse maneuver by sending IPC to focus Niri columns.",
+      "tags": ["Bar", "System"]
+    }
+  ]
+}
