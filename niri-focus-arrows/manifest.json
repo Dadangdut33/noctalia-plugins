@@ -21,6 +21,7 @@
       "wrapAroundColumns": true,
       "iconColor": "primary",
       "combineButtons": false,
+      "compactMode": false,
       "hideTooltip": false
     }
   }

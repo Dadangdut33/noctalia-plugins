@@ -15,6 +15,7 @@ ColumnLayout {
   property bool valueWrapAroundColumns: cfg.wrapAroundColumns ?? defaults.wrapAroundColumns ?? true
   property string valueIconColor: cfg.iconColor ?? defaults.iconColor ?? "primary"
   property bool valueCombineButtons: cfg.combineButtons ?? defaults.combineButtons ?? false
+  property bool valueCompactMode: cfg.compactMode ?? defaults.compactMode ?? false
   property bool valueHideTooltip: cfg.hideTooltip ?? defaults.hideTooltip ?? false
 
   spacing: Style.marginL
@@ -49,6 +50,14 @@ ColumnLayout {
   }
 
   NToggle {
+    label: "Compact mode"
+    description: "Use smaller arrow buttons in split mode (ignored when combine buttons is enabled)."
+    checked: root.valueCompactMode
+    enabled: !root.valueCombineButtons
+    onToggled: checked => root.valueCompactMode = checked
+  }
+
+  NToggle {
     label: "Hide tooltip"
     description: "Disable all hover tooltips for this widget."
     checked: root.valueHideTooltip
@@ -65,6 +74,7 @@ ColumnLayout {
     pluginApi.pluginSettings.wrapAroundColumns = root.valueWrapAroundColumns;
     pluginApi.pluginSettings.iconColor = root.valueIconColor;
     pluginApi.pluginSettings.combineButtons = root.valueCombineButtons;
+    pluginApi.pluginSettings.compactMode = root.valueCompactMode;
     pluginApi.pluginSettings.hideTooltip = root.valueHideTooltip;
     pluginApi.saveSettings();
   }

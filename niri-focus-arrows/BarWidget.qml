@@ -33,6 +33,7 @@ Item {
   readonly property bool reverseScroll: cfg.reverseScroll ?? defaults.reverseScroll ?? false
   readonly property bool wrapAroundColumns: cfg.wrapAroundColumns ?? defaults.wrapAroundColumns ?? true
   readonly property bool combineButtons: cfg.combineButtons ?? defaults.combineButtons ?? false
+  readonly property bool compactMode: cfg.compactMode ?? defaults.compactMode ?? false
   readonly property bool hideTooltip: cfg.hideTooltip ?? defaults.hideTooltip ?? false
   readonly property string iconColorKey: cfg.iconColor ?? defaults.iconColor ?? "primary"
   readonly property real combinedPaddingX: (combineButtons && !isBarVertical) ? Style.marginS * 2 : 0
@@ -41,9 +42,11 @@ Item {
   readonly property color iconColor: iconColorKey === "none" ? Color.mOnSurface : Color.resolveColorKey(iconColorKey)
   readonly property color hoverBgColor: Qt.alpha(iconColor, 0.16)
   readonly property color pressedBgColor: Qt.alpha(iconColor, 0.28)
+  readonly property real splitSegmentSize: (compactMode && !combineButtons) ? Style.toOdd(segmentSize * 0.78) : segmentSize
+  readonly property real splitIconSize: (compactMode && !combineButtons) ? Style.fontSizeM : Style.fontSizeL
 
-  readonly property real contentWidth: (isBarVertical ? capsuleHeight : (combineButtons ? segmentSize : (segmentSize * 2))) + combinedPaddingX
-  readonly property real contentHeight: (isBarVertical ? (combineButtons ? segmentSize : (segmentSize * 2)) : capsuleHeight) + combinedPaddingY
+  readonly property real contentWidth: (isBarVertical ? capsuleHeight : (combineButtons ? segmentSize : (splitSegmentSize * 2))) + combinedPaddingX
+  readonly property real contentHeight: (isBarVertical ? (combineButtons ? segmentSize : (splitSegmentSize * 2)) : capsuleHeight) + combinedPaddingY
 
   implicitWidth: contentWidth
   implicitHeight: contentHeight
@@ -286,8 +289,8 @@ Item {
       spacing: 0
 
       Rectangle {
-        width: root.segmentSize
-        height: root.segmentSize
+        width: root.splitSegmentSize
+        height: root.splitSegmentSize
         radius: Style.radiusM
         color: leftMouseArea.pressed ? root.pressedBgColor : (leftMouseArea.containsMouse ? root.hoverBgColor : "transparent")
 
@@ -295,7 +298,7 @@ Item {
           anchors.centerIn: parent
           icon: "chevron-left"
           color: root.iconColor
-          pointSize: Style.fontSizeL
+          pointSize: root.splitIconSize
           applyUiScale: true
         }
 
@@ -312,8 +315,8 @@ Item {
       }
 
       Rectangle {
-        width: root.segmentSize
-        height: root.segmentSize
+        width: root.splitSegmentSize
+        height: root.splitSegmentSize
         radius: Style.radiusM
         color: rightMouseArea.pressed ? root.pressedBgColor : (rightMouseArea.containsMouse ? root.hoverBgColor : "transparent")
 
@@ -321,7 +324,7 @@ Item {
           anchors.centerIn: parent
           icon: "chevron-right"
           color: root.iconColor
-          pointSize: Style.fontSizeL
+          pointSize: root.splitIconSize
           applyUiScale: true
         }
 
@@ -345,8 +348,8 @@ Item {
       spacing: 0
 
       Rectangle {
-        width: root.segmentSize
-        height: root.segmentSize
+        width: root.splitSegmentSize
+        height: root.splitSegmentSize
         radius: Style.radiusM
         color: leftMouseAreaVertical.pressed ? root.pressedBgColor : (leftMouseAreaVertical.containsMouse ? root.hoverBgColor : "transparent")
 
@@ -354,7 +357,7 @@ Item {
           anchors.centerIn: parent
           icon: "chevron-left"
           color: root.iconColor
-          pointSize: Style.fontSizeL
+          pointSize: root.splitIconSize
           applyUiScale: true
         }
 
@@ -371,8 +374,8 @@ Item {
       }
 
       Rectangle {
-        width: root.segmentSize
-        height: root.segmentSize
+        width: root.splitSegmentSize
+        height: root.splitSegmentSize
         radius: Style.radiusM
         color: rightMouseAreaVertical.pressed ? root.pressedBgColor : (rightMouseAreaVertical.containsMouse ? root.hoverBgColor : "transparent")
 
@@ -380,7 +383,7 @@ Item {
           anchors.centerIn: parent
           icon: "chevron-right"
           color: root.iconColor
-          pointSize: Style.fontSizeL
+          pointSize: root.splitIconSize
           applyUiScale: true
         }
 

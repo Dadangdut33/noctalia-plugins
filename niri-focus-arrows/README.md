@@ -38,7 +38,8 @@ Available in plugin settings UI:
 2. `Wrap around columns`
 3. `Icon color` (Noctalia theme color keys)
 4. `Combine buttons`
-5. `Hide tooltip`
+5. `Compact mode` (make gaps smaller in not combined mode)
+6. `Hide tooltip`
 
 Defaults are defined in `manifest.json` under `metadata.defaultSettings`.
 
