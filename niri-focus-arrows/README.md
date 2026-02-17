@@ -20,28 +20,14 @@ When wrap mode is enabled, it uses:
 
 - Left arrow click: focus left column
 - Right arrow click: focus right column
-- Mouse wheel on widget: focus left/right
-- Right click on widget: open context menu (Widget settings)
+- Right click: configurable action
+- Middle click: configurable action
 
 ### Combined Mode (`combineButtons = true`)
 
 - Left click: focus left column
 - Right click: focus right column
-- Middle click: open context menu (Widget settings)
-- Mouse wheel on widget: focus left/right
-
-## Settings
-
-Available in plugin settings UI:
-
-1. `Reverse scroll direction`
-2. `Wrap around columns`
-3. `Icon color` (Noctalia theme color keys)
-4. `Combine buttons`
-5. `Compact mode` (make gaps smaller in not combined mode)
-6. `Hide tooltip`
-
-Defaults are defined in `manifest.json` under `metadata.defaultSettings`.
+- Middle click: configurable action
 
 ## Installation
 

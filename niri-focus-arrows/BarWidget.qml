@@ -34,6 +34,9 @@ Item {
   readonly property bool wrapAroundColumns: cfg.wrapAroundColumns ?? defaults.wrapAroundColumns ?? true
   readonly property bool combineButtons: cfg.combineButtons ?? defaults.combineButtons ?? false
   readonly property bool compactMode: cfg.compactMode ?? defaults.compactMode ?? false
+  readonly property string splitRightClickAction: cfg.splitRightClickAction ?? defaults.splitRightClickAction ?? "move-column"
+  readonly property string splitMiddleClickAction: cfg.splitMiddleClickAction ?? defaults.splitMiddleClickAction ?? "open-context-menu"
+  readonly property string combinedMiddleClickAction: cfg.combinedMiddleClickAction ?? defaults.combinedMiddleClickAction ?? "open-context-menu"
   readonly property bool hideTooltip: cfg.hideTooltip ?? defaults.hideTooltip ?? false
   readonly property string iconColorKey: cfg.iconColor ?? defaults.iconColor ?? "primary"
   readonly property real combinedPaddingX: (combineButtons && !isBarVertical) ? Style.marginS * 2 : 0
@@ -89,6 +92,54 @@ Item {
     }
 
     return wrapAroundColumns ? "focus-column-right-or-first" : "focus-column-right";
+  }
+
+  function runCustomMouseAction(actionName, direction) {
+    if (!actionName || actionName.length === 0 || actionName === "none") {
+      return;
+    }
+
+    if (actionName === "move-column") {
+      queueNiriAction(direction === "left" ? "move-column-left" : "move-column-right");
+      return;
+    }
+
+    queueNiriAction(actionName);
+  }
+
+  function handleSplitClick(mouse, direction) {
+    if (mouse.button === Qt.RightButton) {
+      if (splitRightClickAction === "open-context-menu") {
+        PanelService.showContextMenu(contextMenu, root, screen);
+      } else {
+        runCustomMouseAction(splitRightClickAction, direction);
+      }
+    } else if (mouse.button === Qt.MiddleButton) {
+      if (splitMiddleClickAction === "open-context-menu") {
+        PanelService.showContextMenu(contextMenu, root, screen);
+      } else {
+        runCustomMouseAction(splitMiddleClickAction, direction);
+      }
+    } else {
+      queueNiriAction(resolveColumnAction(direction));
+    }
+  }
+
+  function handleCombinedClick(mouse) {
+    if (mouse.button === Qt.MiddleButton) {
+      if (combinedMiddleClickAction === "none") {
+        return;
+      }
+      if (combinedMiddleClickAction === "open-context-menu") {
+        PanelService.showContextMenu(contextMenu, root, screen);
+      } else {
+        runCustomMouseAction(combinedMiddleClickAction, "left");
+      }
+    } else if (mouse.button === Qt.RightButton) {
+      queueNiriAction(resolveColumnAction("right"));
+    } else {
+      queueNiriAction(resolveColumnAction("left"));
+    }
   }
 
   function showWidgetTooltip(target, text) {
@@ -164,11 +215,10 @@ Item {
 
     // Global mouse layer:
     // - Wheel: navigate columns
-    // - Right click (split mode): open widget context menu
     MouseArea {
       anchors.fill: parent
       hoverEnabled: true
-      acceptedButtons: Qt.RightButton
+      acceptedButtons: Qt.NoButton
 
       onWheel: (wheel) => {
         const delta = wheel.angleDelta.y !== 0 ? wheel.angleDelta.y :
@@ -178,11 +228,6 @@ Item {
         wheel.accepted = true;
       }
 
-      onClicked: (mouse) => {
-        if (mouse.button === Qt.RightButton && !root.combineButtons) {
-          PanelService.showContextMenu(contextMenu, root, screen);
-        }
-      }
     }
 
     Item {
@@ -192,7 +237,7 @@ Item {
       visible: root.combineButtons
 
       // Combined mode: one hit target
-      // Left click -> left, Right click -> right, Middle click -> settings menu.
+      // Left click -> left, Right click -> right, Middle click -> configurable action.
       Rectangle {
         anchors.fill: parent
         radius: Style.radiusM
@@ -212,18 +257,12 @@ Item {
         cursorShape: Qt.PointingHandCursor
 
         onClicked: (mouse) => {
-          if (mouse.button === Qt.MiddleButton) {
-            PanelService.showContextMenu(contextMenu, root, screen);
-          } else if (mouse.button === Qt.RightButton) {
-            root.queueNiriAction(root.resolveColumnAction("right"));
-          } else {
-            root.queueNiriAction(root.resolveColumnAction("left"));
-          }
+          root.handleCombinedClick(mouse);
         }
 
         onEntered: {
           root.combinedHovered = true;
-          root.showWidgetTooltip(parent, "Left click: focus left | Right click: focus right | Middle click: widget settings");
+          root.showWidgetTooltip(parent, "Left click: focus left | Right click: focus right | Middle click: custom action");
         }
 
         onExited: {
@@ -306,9 +345,10 @@ Item {
           id: leftMouseArea
           anchors.fill: parent
           hoverEnabled: true
+          acceptedButtons: Qt.LeftButton | Qt.RightButton | Qt.MiddleButton
           cursorShape: Qt.PointingHandCursor
 
-          onClicked: root.queueNiriAction(root.resolveColumnAction("left"))
+          onClicked: mouse => root.handleSplitClick(mouse, "left")
           onEntered: root.showWidgetTooltip(parent, "Focus column left")
           onExited: root.hideWidgetTooltip()
         }
@@ -332,9 +372,10 @@ Item {
           id: rightMouseArea
           anchors.fill: parent
           hoverEnabled: true
+          acceptedButtons: Qt.LeftButton | Qt.RightButton | Qt.MiddleButton
           cursorShape: Qt.PointingHandCursor
 
-          onClicked: root.queueNiriAction(root.resolveColumnAction("right"))
+          onClicked: mouse => root.handleSplitClick(mouse, "right")
           onEntered: root.showWidgetTooltip(parent, "Focus column right")
           onExited: root.hideWidgetTooltip()
         }
@@ -365,9 +406,10 @@ Item {
           id: leftMouseAreaVertical
           anchors.fill: parent
           hoverEnabled: true
+          acceptedButtons: Qt.LeftButton | Qt.RightButton | Qt.MiddleButton
           cursorShape: Qt.PointingHandCursor
 
-          onClicked: root.queueNiriAction(root.resolveColumnAction("left"))
+          onClicked: mouse => root.handleSplitClick(mouse, "left")
           onEntered: root.showWidgetTooltip(parent, "Focus column left")
           onExited: root.hideWidgetTooltip()
         }
@@ -391,9 +433,10 @@ Item {
           id: rightMouseAreaVertical
           anchors.fill: parent
           hoverEnabled: true
+          acceptedButtons: Qt.LeftButton | Qt.RightButton | Qt.MiddleButton
           cursorShape: Qt.PointingHandCursor
 
-          onClicked: root.queueNiriAction(root.resolveColumnAction("right"))
+          onClicked: mouse => root.handleSplitClick(mouse, "right")
           onEntered: root.showWidgetTooltip(parent, "Focus column right")
           onExited: root.hideWidgetTooltip()
         }
